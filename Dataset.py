@@ -1,5 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+
 
 
 def load_data():
@@ -8,9 +10,9 @@ def load_data():
     data = pd.read_csv("student-mat.csv")
 
     #Editing the raw dataset to get x_train and y_train
-    school_name = input("Choose the school (GP or MS): ")
+    #school_name = input("Choose the school (GP or MS): ")
 
-    data = data.loc[data["school"] == school_name]
+    data = data.loc[data["school"] == "GP"]
     data = data[["sex", "age", "famsize", "Pstatus", "Mjob", "Fjob", "higher", "activities", "G3"]]
 
 
@@ -34,10 +36,14 @@ def load_data():
 
     #Extracting x_train and y_train from the table
     x_train = data.drop(["G3"], axis = 1)
+    #Normalizing the data
+    scaler = StandardScaler()
+    x_train = pd.DataFrame(scaler.fit_transform(x_train), columns=x_train.columns)
     x_train = x_train.to_numpy()
     y_train = data["G3"].to_numpy()
-
+    
     return x_train, y_train
+
 
 
 
