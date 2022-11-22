@@ -12,7 +12,7 @@ def load_data(file_name):
     The input x_train includes the features ["sex", "age", "Pstatus", "Mjob", "Fjob", "higher", "activities"],
     the output y_train contains the final grade G3.
 
-    Args:
+    Parameters:
         file_name (string): path to a student dataset
 
     Returns:
@@ -23,28 +23,22 @@ def load_data(file_name):
     data = pd.read_csv(file_name)
 
     # Editing the raw dataset to get x_train and y_train
-    school_name = input("Choose the school (for student-mat.csv - GP or MS): ")
+    data = data[["school", "sex", "age", "Mjob", "Fjob", "higher", "activities", "G3"]]
 
-    data = data.loc[data["school"] == school_name]
-    data = data[["sex", "age", "Pstatus", "Mjob", "Fjob", "higher", "activities", "G3"]]
-    print("Hello")
     # Turning categorical features into numbers
-    # Dummy matrices
-    non_num = data.select_dtypes(include="object")
-    for column in non_num.columns:
-        if len(non_num[column].unique()) == 2:
-            non_num = non_num.drop([column], axis=1)
-        else:
-            non_num[column] = non_num[column].apply(lambda x: column[0].lower() + "_" + x)
-            dummies = pd.get_dummies(non_num[column])
-            data = pd.concat([data, dummies], axis=1)
-            data = data.drop([column], axis=1)
-
-    # Binary label encoding
+    # Dummy matrices + Label Encoding
     non_num = data.select_dtypes(include="object")
     encoder = LabelEncoder()
     for column in non_num.columns:
-        data[column] = encoder.fit_transform(data[column])
+        if len(non_num[column].unique()) == 2:
+            data[column] = encoder.fit_transform(data[column])
+
+        else:
+            non_num[column] = non_num[column].apply(lambda x: column[0].lower() + "_" + x)
+            dummies = pd.get_dummies(non_num[column])
+            dummies = dummies.drop([dummies.columns[-1]], axis=1)
+            data = pd.concat([data, dummies], axis=1)
+            data = data.drop([column], axis=1)
 
     # Extracting x_train and y_train from the table
     x_train = data.drop(["G3"], axis=1)
@@ -64,7 +58,7 @@ def compute_cost(x, y, w, b):
     """
     Computes the cost function for linear regression.
 
-    Args:
+    Parameters:
         x (ndarray): Shape (m,n) Input to the model (features of students)
         y (ndarray): Shape (m,) Target (final grade G3 of students)
         w (ndarray): Shape(n,) Parameter of a model
@@ -91,7 +85,7 @@ def compute_gradient(x, y, w, b):
     """
     Computes the gradient for linear regression.
 
-    Args:
+    Parameters:
         x (ndarray): Shape (m,n) Input to the model (features of students)
         y (ndarray): Shape (m,) Target (final grade G3 of students)
         w (ndarray): Shape(n,) Parameter of a model
@@ -137,7 +131,7 @@ def gradient_descent(x, y, w_init, b_init, cost_function, gradient_function, alp
     Performs gradient descent to compute parameters w, b of the model. Updated the parameters by taking
     num_iters gradient steps with the learning rate alpha.
 
-    Args:
+    Parameters:
         x (ndarray): Shape (m,n) Input to the model (features of students)
         y (ndarray): Shape (m,) Target (final grade G3 of students)
         w_init (ndarray): Shape (n,) Initial parameter of the model
@@ -183,7 +177,7 @@ def predict(x, w, b):
 
     Predicts the final grade of a student by using the trained model with updates parameters w and b.
 
-    Args:
+    Parameters:
         x (ndarray): Shape (m,n) Input to the model (features of students)
         w (ndarray): Shape(n,) Updated parameter of the trained model
         b (scalar): Updated parameter of the trained model
@@ -201,7 +195,7 @@ def learning_curve(num_iters, cost_history):
 
     Generates a learning curve (cost function J vs iterations). If J decreases at each step, than the model works.
 
-    Args:
+    Parameters:
         num_iters (int): Number of iterations to run gradient descent
         cost_history (list): Shape (num_iters,) Values of cost function at each itaeration step
 
