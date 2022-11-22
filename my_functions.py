@@ -44,14 +44,49 @@ def load_data(file_name):
     x_train = data.drop(["G3"], axis=1)
     y_train = data["G3"]
 
-    # Normalizing the data
-    scaler = StandardScaler()
-    x_train = pd.DataFrame(scaler.fit_transform(x_train), columns=x_train.columns)
-
-    x_train = x_train.to_numpy()
-    y_train = y_train.to_numpy()
-
     return x_train, y_train
+
+
+def pd_to_np(x, y):
+    """
+
+    Converts a Dataframe to a Numpy array.
+
+    Parameters:
+        x (pandas dataframe): Training set as DataFrame
+        y (pandas dataframe): Output set as DataFrame
+
+    Returns:
+        x (ndarray): Training set as Numpy array
+        y (ndarray): Output set as Numpy array
+    """
+
+    x = x.to_numpy()
+    y = y.to_numpy()
+
+    x = x.astype('float64')
+    y = y.astype('float64')
+
+    return x, y
+
+
+def normalize(x):
+    """
+
+    Performs feature scaling in the range [0,1] by division of each feature by its maximum value.
+
+    Parameters:
+        x (ndarray): Training set (features of students)
+
+    Returns:
+        x (ndarray): Training set exposed to feature scaling (input to the model)
+    """
+
+    x = x.astype('float64')
+    for column in range(x.shape[1]):
+        x[:, column] = x[:, column] / x[:, column].max()
+
+    return x
 
 
 def compute_cost(x, y, w, b):
